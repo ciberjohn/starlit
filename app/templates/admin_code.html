@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}One-time code · Starlit{% endblock %}
+{% block wrapclass %}narrow{% endblock %}
+{% block body %}
+<div class="card">
+  {% if invite %}
+    <h2>An invitation for {{ target }}</h2>
+    <p class="sub">Send this to them. They choose their own password and authenticator —
+       you never see either. It works once.</p>
+    <p class="hint" style="margin-top:0">Registration link:</p>
+    <p style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;
+              word-break:break-all">{{ url_for('enrol', code=code, _external=True) }}</p>
+  {% elif reinvite %}
+    <h2>A fresh invitation for {{ target }}</h2>
+    <p class="sub">Their old account and its charts have been removed, so they can register from
+       scratch. This code works once.</p>
+  {% else %}
+    <h2>A reset code for {{ target }}</h2>
+    <p class="sub">Their old authenticator has been cleared and any open session ended. This code
+       works once, and lets them set a new password and authenticator.</p>
+  {% endif %}
+
+  {% if not invite %}
+  <p style="font-size:17px;font-family:ui-monospace,Menlo,Consolas,monospace;
+            background:#FFFDFB;border:1px solid var(--line);border-radius:9px;
+            padding:14px 16px;word-break:break-all">{{ code }}</p>
+
+  <p class="hint">Send them this code and this link:</p>
+  <p style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;word-break:break-all">
+    {% if reinvite %}{{ url_for('enrol', code=code, _external=True) }}
+    {% else %}{{ url_for('reset', code=code, _external=True) }}{% endif %}
+  </p>
+  {% endif %}
+
+  <p class="hint" style="color:var(--warn)">Shown once — copy it now, it can't be displayed again.</p>
+
+  <p style="margin-top:22px"><a class="btn" href="{{ url_for('admin') }}">Back to admin</a></p>
+</div>
+{% endblock %}

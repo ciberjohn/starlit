@@ -1,0 +1,46 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 1600 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 1203 >>
+stream
+BT
+/F1 9 Tf
+12 TL
+30 760 Td
+(Row 1 \(RS\): SC in 2nd CH from hook and in all remaining CH. \(36\)) Tj T*
+(Row 2 \(WS\): CH3 \(counts as 1st DC\), DC in next and in all remaining ST until next to last one, DC in last ST. \(36\)) Tj T*
+(Row 3 \(RS\): CH1 \(doesn't count as ST here and throughout\), SC in 1st ST, SC in all remaining ST. \(36\)) Tj T*
+(Row 4 \(WS\): CH1, SC in 1st ST, SC in next 2ST, repeat *SC in next ST, skip 3ST, 5DTR in next ST, CH1, 5DTR in next ST, skip 3ST, SC in next ST* until 3ST remain, SC in last 3ST. \(36\)) Tj T*
+(Row 5 \(RS\): CH1, SC in 1st ST, SC in all remaining ST. \(36\)) Tj T*
+(Row 6 \(WS\): repeat row 3) Tj T*
+(Row 7 \(RS\): CH3, starting from 2nd ST repeat *DCC in next ST, CH2 & skip 2ST* until 2ST remain, DCC in next to last ST, DC in last ST. \(36\)) Tj T*
+(Row 8 \(WS\): CH1, SC in 1st ST, SC in all remaining ST. \(36\)) Tj T*
+(Row 9 \(RS\): CH1, SC in 1st ST, SC in next 2ST, repeat *SC in next ST, skip 3ST, 5DTR in next ST, CH1, 5DTR in next ST, skip 3ST, SC in next ST* until 3ST remain, SC in last 3ST. \(36\)) Tj T*
+(Row 10 \(WS\): CH3 \(counts as 1st DC\), DC in next and in all remaining ST until next to last one, DC in last ST. \(36\)) Tj T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000242 00000 n 
+0000000312 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1567
+%%EOF

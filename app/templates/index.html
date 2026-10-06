@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Your charts · Starlit{% endblock %}
+{% block body %}
+
+<div class="card">
+  <h2>Turn a pattern into a chart</h2>
+  <p class="sub">Upload a written crochet pattern as a PDF. You'll get a symbol chart back —
+     and an honest note of any rows I wouldn't vouch for.</p>
+
+  <form id="convert-form" method="post" action="{{ url_for('convert') }}"
+        enctype="multipart/form-data">
+    <label for="pdf">Choose the pattern PDF</label>
+    <input id="pdf" name="pdf" type="file" accept="application/pdf,.pdf" required>
+    <button type="submit">Make my chart</button>
+  </form>
+
+  <div id="working" class="working" hidden>
+    <div class="spinner" role="status" aria-label="working"></div>
+    <div>
+      <p id="work-stage">sending the pattern</p>
+      <p id="work-meta" class="hint"></p>
+      <div id="work-bar" class="bar" hidden><div id="work-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <p class="hint">{{ today }} of {{ cap }} conversions used today. Your PDF is deleted as soon as
+     it has been read.</p>
+</div>
+
+<div class="card">
+  <h2>Your charts</h2>
+  {% if rows %}
+    <table>
+      <thead><tr><th>Pattern</th><th>When</th><th>Rows</th><th></th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td>{{ r.filename }}</td>
+          <td>{{ r.created[:16].replace('T', ' ') }}</td>
+          <td><span class="pill good">{{ r.verified }} charted</span>
+              {% if r.unverified %}<span class="pill warn">{{ r.unverified }} to check</span>{% endif %}</td>
+          <td><a href="{{ url_for('result', cid=r.id) }}">open</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="sub" style="margin:0">Nothing yet — the first chart you make will appear here.</p>
+  {% endif %}
+</div>
+
+<script>
+// The wait is real: sending the pattern, then reading it, drawing the chart, then making ~16 print
+// sheets. Every line below reports something the server or the browser actually knows — the upload
+// percentage comes from the transfer itself, the rest from /progress, which the conversion updates
+// as it moves through its phases. Nothing here is a timed guess. Without JavaScript the plain form
+// still posts and works exactly as before.
+(function () {
+  const form = document.getElementById('convert-form');
+  const panel = document.getElementById('working');
+  if (!form || !panel || !window.XMLHttpRequest || !window.fetch) return;
+
+  const stageEl = document.getElementById('work-stage');
+  const metaEl = document.getElementById('work-meta');
+  const bar = document.getElementById('work-bar');
+  const fill = document.getElementById('work-bar-fill');
+  let t0 = 0, lastStage = '', lastChange = 0, timer = null, poll = null;
+
+  function show(text) { stageEl.textContent = text; }
+
+  function tick() {
+    const secs = (Date.now() - t0) / 1000;
+    metaEl.textContent = secs < 1.5 ? ''
+      : (secs < 60 ? secs.toFixed(0) + ' s elapsed'
+                   : Math.floor(secs / 60) + ' min ' + Math.round(secs % 60) + ' s elapsed')
+        + ' — keep this tab open';
+    // Silence is what felt like a freeze, so say something if the server goes quiet.
+    if (lastStage && Date.now() - lastChange > 8000)
+      show(lastStage + ' — still working');
+  }
+
+  function progressBar(done, total) {
+    if (!total) { bar.hidden = true; return; }
+    bar.hidden = false;
+    fill.style.width = Math.round((done / total) * 100) + '%';
+    fill.title = 'sheet ' + done + ' of ' + total;
+  }
+
+  function ask() {
+    fetch('{{ url_for("progress") }}', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (p) {
+        if (!p || !p.stage) return;
+        if (p.stage !== lastStage) {
+          lastStage = p.stage;
+          lastChange = Date.now();
+          show(p.total ? p.stage + ' — sheet ' + p.done + ' of ' + p.total : p.stage);
+        }
+        if (p.total) progressBar(p.done, p.total);
+      })
+      .catch(function () {});
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    const fd = new FormData(form);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', form.action);
+    xhr.upload.addEventListener('progress', function (e) {
+      if (!e.lengthComputable) return;
+      const pc = Math.round((e.loaded / e.total) * 100);
+      show(pc < 100 ? 'sending the pattern — ' + pc + '%' : 'the pattern is in, reading it');
+      lastChange = Date.now();
+    });
+    xhr.onload = function () {
+      if (xhr.responseURL) window.location = xhr.responseURL;
+      else window.location.reload();
+    };
+    xhr.onerror = function () {
+      clearInterval(poll); clearInterval(timer);
+      panel.hidden = true; form.hidden = false;
+    };
+    t0 = Date.now();
+    lastChange = t0;
+    lastStage = 'sending the pattern';
+    show('sending the pattern');
+    form.hidden = true;
+    panel.hidden = false;
+    poll = setInterval(ask, 700);
+    timer = setInterval(tick, 500);
+    xhr.send(fd);
+  });
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,121 @@
+:root {
+  --cream:   #FBF6F1;
+  --card:    #FFFFFF;
+  --ink:     #35292B;
+  --muted:   #8A7C7A;
+  --rose:    #B0726B;
+  --rose-dk: #8E5A55;
+  --sage:    #7E8F72;
+  --line:    #EADFD8;
+  --warn:    #B4763C;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font: 16px/1.6 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+a { color: var(--rose-dk); }
+
+.wrap { max-width: 900px; margin: 0 auto; padding: 28px 22px 64px; }
+.wrap.narrow { max-width: 460px; }
+
+header.top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; padding: 22px 0 14px; border-bottom: 1px solid var(--line); margin-bottom: 26px;
+}
+header.top h1 {
+  margin: 0; font-size: 25px; font-weight: 500; letter-spacing: .2px;
+}
+header.top h1 span { color: var(--rose); }
+header.top .who { color: var(--muted); font-size: 14px; }
+
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 26px 28px; margin-bottom: 22px;
+  box-shadow: 0 1px 2px rgba(80,50,45,.03), 0 8px 24px rgba(80,50,45,.045);
+}
+.card h2 { margin: 0 0 6px; font-size: 19px; font-weight: 500; }
+.card p.sub { margin: 0 0 18px; color: var(--muted); font-size: 14.5px; }
+
+label { display: block; font-size: 14px; margin: 14px 0 5px; color: var(--muted); }
+input[type=text], input[type=password], input[type=file] {
+  width: 100%; padding: 11px 13px; font: inherit; font-size: 15px;
+  border: 1px solid var(--line); border-radius: 9px; background: #FFFDFB; color: var(--ink);
+}
+input:focus { outline: 2px solid rgba(176,114,107,.35); outline-offset: 1px; border-color: var(--rose); }
+input[type=file] { padding: 9px; background: #FFFDFB; }
+
+button, .btn {
+  display: inline-block; margin-top: 20px; padding: 11px 22px;
+  font: inherit; font-size: 15px; cursor: pointer;
+  background: var(--rose); color: #fff; border: 0; border-radius: 9px;
+  text-decoration: none;
+}
+button:hover, .btn:hover { background: var(--rose-dk); }
+/* destructive actions read differently from the soft default button */
+button.danger { background: #A8524A; }
+button.danger:hover { background: #8E423B; }
+
+.msg { padding: 11px 15px; border-radius: 9px; margin-bottom: 16px; font-size: 14.5px; }
+.msg.err  { background: #FBF0EE; border: 1px solid #E8CFCA; color: #8E4A42; }
+.msg.ok   { background: #F1F4EE; border: 1px solid #D6E0CD; color: #4F6247; }
+.msg.warn { background: #FCF4EA; border: 1px solid #EAD9BE; color: #8A5A25; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 500; font-size: 13px; letter-spacing: .3px; text-transform: uppercase; }
+
+.pill { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12.5px; }
+.pill.good { background: #EFF4EA; color: #556A4B; }
+.pill.warn { background: #FCF3E7; color: #8A5A25; }
+
+.chart { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: #fff; margin-top: 14px; }
+
+.hint { color: var(--muted); font-size: 13.5px; margin-top: 10px; }
+
+/* idle countdown */
+#idlebar {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--sage); transform-origin: left; opacity: .8;
+}
+#idle-note {
+  position: fixed; bottom: 12px; right: 14px; font-size: 12.5px; color: var(--muted);
+  background: rgba(251,246,241,.94); padding: 4px 10px; border-radius: 99px;
+  border: 1px solid var(--line);
+}
+
+ol.rows { margin: 8px 0 0; padding-left: 20px; font-size: 14.5px; }
+ol.rows li { margin-bottom: 3px; }
+details { margin-top: 14px; }
+summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+
+/* waiting on a conversion: the sheets take a few seconds, and silence read as a freeze */
+[hidden] { display: none !important; }
+
+.working {
+  display: flex; align-items: flex-start; gap: 16px;
+  margin-top: 22px; padding: 18px 20px;
+  background: #FFFDFB; border: 1px solid var(--line); border-radius: 11px;
+}
+.working p { margin: 0; font-size: 15px; }
+.working #work-meta { margin-top: 4px; }
+
+.spinner {
+  flex: 0 0 auto; width: 30px; height: 30px; margin-top: 2px;
+  border: 3px solid var(--line); border-top-color: var(--rose); border-radius: 50%;
+  animation: turn .9s linear infinite;
+}
+@keyframes turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.6s; } }
+
+/* the print sheets are the slow part, so they get a real count */
+.bar {
+  margin-top: 10px; height: 5px; width: 100%; max-width: 320px;
+  background: var(--line); border-radius: 99px; overflow: hidden;
+}
+.bar > div { height: 100%; width: 0; background: var(--sage); border-radius: 99px; }

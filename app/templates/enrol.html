@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Set up your account · Starlit{% endblock %}
+{% block wrapclass %}narrow{% endblock %}
+{% block body %}
+
+{% if bad %}
+<div class="card">
+  <h2>That invitation has already been used</h2>
+  <p class="sub">Each invitation works once. Ask your administrator for a fresh one and it'll take a moment to sort out.</p>
+</div>
+{% else %}
+<div class="card">
+  <h2>Set up your account</h2>
+  <p class="sub">You've been invited. Choose how you'll sign in — I never see either of these.</p>
+
+  {% if err %}<div class="msg err">{{ err }}</div>{% endif %}
+
+  <form method="post" autocomplete="off">
+    <input type="hidden" name="code" value="{{ code }}">
+
+    <label for="username">Pick a username</label>
+    <input id="username" name="username" type="text" autocomplete="username" required>
+
+    <label for="password">Choose a password</label>
+    <input id="password" name="password" type="password" autocomplete="new-password"
+           minlength="10" required>
+    <p class="hint">At least 10 characters. A phrase you'll remember beats a jumble you won't.</p>
+
+    <label for="password2">And again</label>
+    <input id="password2" name="password2" type="password" autocomplete="new-password" required>
+
+    <button type="submit">Continue</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

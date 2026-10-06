@@ -1,0 +1,14 @@
+services:
+  starlit:
+    build: .
+    ports:
+      - "6090:6090"
+    volumes:
+      - starlit-data:/data
+    restart: unless-stopped
+    # Optional: enable the LLM fallback (a vocabulary widener for unrecognised clauses).
+    # environment:
+    #   DEEPSEEK_API_KEY: sk-...
+
+volumes:
+  starlit-data:

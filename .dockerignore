@@ -1,0 +1,14 @@
+.git
+.gitignore
+data/
+charts/
+uploads/
+venv/
+__pycache__/
+*.pyc
+*.db
+*.db-wal
+*.db-shm
+secrets.env
+.env
+.pytest_cache/

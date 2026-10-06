@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ row.filename }} · Starlit{% endblock %}
+{% block body %}
+
+<div class="card">
+  <h2>{{ row.filename }}</h2>
+  <p class="sub">Read {{ row.created[:16].replace('T', ' ') }}.
+     <span class="pill good">{{ row.verified }} rows charted</span>
+     {% if row.unverified %}<span class="pill warn">{{ row.unverified }} need your eye</span>{% endif %}
+  </p>
+
+  {% for img in data.images %}
+    <a href="{{ url_for('chart', name=img) }}" target="_blank" rel="noopener"
+       title="Open full size">
+      <img class="chart" src="{{ url_for('chart', name=img) }}" alt="Crochet symbol chart">
+    </a>
+  {% endfor %}
+
+  {% if data.images %}
+    <p class="hint">Click the chart to open it full size in a new tab —
+       <a href="{{ url_for('chart', name=data.images[0]) }}" download>download the PNG</a>.
+       The full chart is {{ 'very wide' if true else '' }} — scroll sideways on a phone.</p>
+  {% endif %}
+
+  {% if not data.images %}
+    <div class="msg warn">No chart could be drawn from this file.</div>
+  {% endif %}
+</div>
+
+{% if data.pdf %}
+<div class="card">
+  <h2>Print sheets — A4, {{ data.pdf_pages }} pages</h2>
+  <p class="sub">The same chart, cut into pages you can print: one stitch prints
+     {{ data.mm_per_stitch | round(1) }} mm wide, so a symbol comes out about
+     {{ data.glyph_mm }} mm across. Sheet 1 is the key and the page map; the chart pages then run
+     from the bottom row upwards, left to right. Every cut repeats two stitches from the sheet
+     next door, so a shell or a cluster is never left half-drawn on either page.</p>
+  <p><a class="btn" href="{{ url_for('download', name=data.pdf) }}">Download the print sheets</a>
+     <span class="hint">PDF, {{ data.pdf_pages }} pages · print at 100 %, not "fit to page",
+     or the stitch size won't match the pattern.</span></p>
+  {% if data.crowded %}
+    <p class="hint">Squeezed on {{ data.crowded.keys() | join(', ') }}: those rows work a
+       multi-leg fan into a single stitch with a chain beside it, which is more than one stitch
+       column can hold. The symbols are narrowed sideways to keep them apart, never in height.
+       A wider stitch size would give them more room.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if data.unverified %}
+<div class="card">
+  <h2>Rows I couldn't be sure of</h2>
+  <p class="sub">Everything below is <em>left out</em> of the chart rather than guessed at.
+     Each one is a row the arithmetic didn't confirm, so it's worth a look by eye.</p>
+  <table>
+    <thead><tr><th>Row</th><th>Why</th></tr></thead>
+    <tbody>
+    {% for r, why in data.unverified.items() %}
+      <tr><td>{{ r }}</td><td>{{ why }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card">
+  <h2>Every row checked out</h2>
+  <p class="sub" style="margin:0">Each row reconciled against the pattern's stitch count, so the
+     chart should be complete.</p>
+</div>
+{% endif %}
+
+<p><a class="btn" href="{{ url_for('index') }}">Back</a></p>
+{% endblock %}

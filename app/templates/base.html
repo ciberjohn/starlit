@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Starlit{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="wrap {% block wrapclass %}{% endblock %}">
+    <header class="top">
+      <h1>Starlit <span>&middot;</span> crochet pattern charts</h1>
+      {% if user %}
+        <div class="who">
+          {% if user.is_admin %}<a href="{{ url_for('admin') }}">admin</a> &nbsp;·&nbsp;{% endif %}
+          {{ user.username }} &nbsp;·&nbsp; <a href="{{ url_for('logout') }}">sign out</a>
+        </div>
+      {% endif %}
+    </header>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, m in msgs %}
+        <div class="msg {{ 'err' if cat == 'error' else 'ok' }}">{{ m }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    {% block body %}{% endblock %}
+  </div>
+
+  {% if user %}
+  <div id="idlebar"></div>
+  <div id="idle-note"></div>
+  <script>
+    // Idle timeout mirror of the server's rule. The server is authoritative — if this
+    // drifts, the next request is simply refused and you land back on the sign-in page.
+    const IDLE = {{ idle }} * 1000;
+    let deadline = Date.now() + IDLE;
+    const note = document.getElementById('idle-note');
+    const bar  = document.getElementById('idlebar');
+    function bump() { deadline = Date.now() + IDLE; }
+    ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(
+      e => window.addEventListener(e, bump, { passive: true }));
+    setInterval(() => {
+      const left = deadline - Date.now();
+      if (left <= 0) { window.location = "{{ url_for('login') }}"; return; }
+      bar.style.transform = `scaleX(${Math.max(0, left / IDLE)})`;
+      const m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+      note.textContent = left < 120000
+        ? `signing out in ${m}:${String(s).padStart(2, '0')} — move the mouse to stay`
+        : '';
+    }, 500);
+  </script>
+  {% endif %}
+</body>
+</html>

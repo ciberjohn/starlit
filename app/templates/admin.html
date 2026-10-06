@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Admin · Starlit{% endblock %}
+{% block body %}
+
+<div class="card">
+  <h2>Invite someone</h2>
+  <p class="sub">Creates a single-use link you can send however you like. They pick their own
+     password and authenticator.</p>
+  <form method="post" action="{{ url_for('admin_invite') }}">
+    <label for="note">Who is it for? (only you see this)</label>
+    <input id="note" name="note" type="text" placeholder="e.g. Alice" maxlength="80">
+    <label style="display:flex;align-items:center;gap:9px;margin-top:14px">
+      <input type="checkbox" name="admin" style="width:auto">
+      <span>Make this person an administrator</span>
+    </label>
+    <button type="submit">Create invitation</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Storage</h2>
+  <p class="sub">Kept files: charts plus any upload a crashed conversion left behind.</p>
+
+  <p style="margin:14px 0 6px">
+    <strong>{{ st.total_h }}</strong> of {{ st.cap_h }} used
+    <span class="hint">({{ st.pct }}%)</span>
+  </p>
+  <div style="height:9px;background:#F0E6DC;border-radius:5px;overflow:hidden">
+    <div style="height:100%;width:{{ st.pct }}%;background:{{ '#C2705F' if st.pct > 80 else '#8FA98B' }}"></div>
+  </div>
+
+  <p class="hint" style="margin-top:12px">
+    Charts: {{ st.charts_files }} file{{ '' if st.charts_files == 1 else 's' }}, {{ st.charts_h }}<br>
+    Stranded uploads: {{ st.uploads_files }} file{{ '' if st.uploads_files == 1 else 's' }}, {{ st.uploads_h }}
+  </p>
+
+  <form method="post" action="{{ url_for('admin_clear') }}" style="margin-top:16px">
+    <button type="submit" name="action" value="old">Clear charts older than 30 days</button>
+  </form>
+  <form method="post" action="{{ url_for('admin_clear') }}" style="margin-top:9px">
+    <button type="submit" name="action" value="uploads">Sweep leftovers (orphans + stranded uploads)</button>
+  </form>
+  <form method="post" action="{{ url_for('admin_clear') }}" style="margin-top:9px"
+        onsubmit="return confirm('Delete EVERY chart and stranded upload? This cannot be undone.')">
+    <button type="submit" name="action" value="all" class="danger">Clear everything</button>
+  </form>
+
+  <p class="hint" style="margin-top:12px">
+    The app also holds itself under {{ st.cap_h }} automatically: before each conversion it
+    removes stranded uploads, then the oldest charts, until it is back under.
+  </p>
+</div>
+
+<div class="card">
+  <h2>People</h2>
+  <p class="sub">Resetting issues a one-time code — the user sets their own password and authenticator,
+     so you can unlock the account without ever knowing either.</p>
+
+  <table>
+    <thead><tr><th>User</th><th>Created</th><th>Charts</th><th>State</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for u2 in users %}
+      <tr>
+        <td>{{ u2.username }}{% if u2.is_admin %} <span class="pill good">admin</span>{% endif %}</td>
+        <td>{{ u2.created[:10] }}</td>
+        <td>{{ conv.get(u2.id, 0) }}</td>
+        <td>
+          {% if u2.active %}<span class="pill good">active</span>
+          {% else %}<span class="pill warn">disabled</span>{% endif %}
+          {% if not u2.totp_secret %}<span class="pill warn">no 2FA</span>{% endif %}
+        </td>
+        <td>
+          <form method="post" action="{{ url_for('admin_reset', uid=u2.id) }}" style="display:inline">
+            <button type="submit" style="margin:0;padding:5px 11px;font-size:13px">reset</button>
+          </form>
+          <form method="post" action="{{ url_for('admin_toggle', uid=u2.id) }}" style="display:inline">
+            <button type="submit" style="margin:0;padding:5px 11px;font-size:13px;background:var(--sage)">
+              {{ 'disable' if u2.active else 'enable' }}</button>
+          </form>
+          {% if u2.id != user.id %}
+          <form method="post" action="{{ url_for('admin_reinvite', uid=u2.id) }}" style="display:inline"
+                onsubmit="return confirm('This REMOVES {{ u2.username }} and all their charts, then issues a fresh invitation. Charts cannot be recovered. Continue?')">
+            <button type="submit" style="margin:0;padding:5px 11px;font-size:13px;background:#A8763C">
+              force re-register</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Recent codes</h2>
+  {% if resets %}
+  <table>
+    <thead><tr><th>Code</th><th>For user</th><th>Issued by</th><th>Used?</th></tr></thead>
+    <tbody>
+    {% for r in resets %}
+      <tr>
+        <td style="font-family:ui-monospace,Menlo,monospace;font-size:13px">{{ r.code }}</td>
+        <td>#{{ r.user_id }}</td>
+        <td>{{ r.issued_by }}</td>
+        <td>{% if r.used_at %}<span class="pill good">used</span>
+            {% else %}<span class="pill warn">outstanding</span>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="sub" style="margin:0">No reset codes issued yet.</p>{% endif %}
+</div>
+
+<div class="card">
+  <h2>Activity</h2>
+  <p class="sub">Admin actions are recorded, because an admin can take over an account.</p>
+  <table>
+    <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Target</th></tr></thead>
+    <tbody>
+    {% for l in logs %}
+      <tr><td>{{ l.at[:16].replace('T', ' ') }}</td><td>{{ l.actor }}</td>
+          <td>{{ l.action }}</td><td>{{ l.target }}{% if l.note %} — {{ l.note }}{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

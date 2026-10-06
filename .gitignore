@@ -1,0 +1,28 @@
+# Secrets and instance data — never commit these
+secrets.env
+*.env
+!*.env.example
+crochet-credentials
+
+# Runtime state (the default STARLIT_DATA is ./data)
+data/
+*.db
+*.db-wal
+*.db-shm
+venv/
+__pycache__/
+*.pyc
+
+# Generated output and local scratch
+charts/
+uploads/
+*.png
+*.pdf
+verify.json
+converted.json
+rows.json
+
+# ...except the shipped sample fixture, which is the point of sample/
+!sample/rows.json
+!sample/pattern.pdf
+!sample/*.png

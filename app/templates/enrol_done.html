@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Almost there · Starlit{% endblock %}
+{% block wrapclass %}narrow{% endblock %}
+{% block body %}
+<div class="card">
+  <h2>One last step — your authenticator app</h2>
+  <p class="sub">Your password is set. Now add the 6-digit code.</p>
+
+  <p>Open your authenticator app (1Password, Proton Pass, Google Authenticator — any of them)
+     and add a new account. Scan this:</p>
+
+  <p style="text-align:center">
+    <img src="{{ qr }}" alt="Setup QR code"
+         style="width:230px;height:230px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff">
+  </p>
+
+  <details>
+    <summary>Can't scan it? Show the text code instead</summary>
+    <p class="hint" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;
+                          letter-spacing:1.5px;word-break:break-all;color:var(--ink)">{{ secret }}</p>
+    <p class="hint">Type that in by hand if the camera won't cooperate. It's shown once, here only.</p>
+  </details>
+
+  <p style="margin-top:22px"><a class="btn" href="{{ url_for('login') }}">Go to sign in</a></p>
+  <p class="hint">Keep this page open until your app shows a code — after that it can't be shown again.</p>
+</div>
+{% endblock %}
